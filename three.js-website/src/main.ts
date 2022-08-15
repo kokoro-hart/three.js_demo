@@ -9,7 +9,7 @@ const gui = new dat.GUI();
 console.log(THREE);
 
 //canvasの取得
-const canvasElement = document.querySelector('.webgl');
+const canvasElement:any = document.querySelector('.webgl');
 
 // シーン
 const scene = new THREE.Scene();
@@ -135,9 +135,10 @@ function rotate() {
 rotate();
 
 // カーソルの取得
-const cursor = {};
-cursor.x = 0;
-cursor.y = 0;
+const cursor = {
+  x: 0,
+  y: 0
+};
 
 addEventListener('mousemove', (event) => {
   cursor.x = event.clientX / sizes.width - 0.5;
