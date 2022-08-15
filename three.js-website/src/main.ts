@@ -1,6 +1,10 @@
 import './style.css';
 import * as THREE from 'three';
 import { WebGLRenderer } from 'three';
+import * as dat from 'lil-gui';
+
+// UIデバッグのインスタンス化
+const gui = new dat.GUI();
 
 console.log(THREE);
 
@@ -39,6 +43,11 @@ const material = new THREE.MeshPhysicalMaterial({
   flatShading: false,
 });
 
+//UIデバッグの実装
+gui.addColor(material, 'color');
+gui.add(material, 'metalness').min(0).max(1).step(0.001);
+gui.add(material, 'roughness').min(0).max(1).step(0.001);
+
 //ジオメトリ
 const mesh1 = new THREE.Mesh(new THREE.TorusGeometry(1, 0.4, 16, 60), material);
 const mesh2 = new THREE.Mesh(new THREE.OctahedronGeometry(), material);
@@ -52,6 +61,7 @@ mesh3.position.set(2, 0, -6);
 mesh4.position.set(5, 0, 3);
 
 scene.add(mesh1, mesh2, mesh3, mesh4);
+const meshes = [mesh1, mesh2, mesh3, mesh4];
 
 // ライトを追加
 const directionalLight = new THREE.DirectionalLight('#ffffff', 4);
@@ -73,9 +83,44 @@ addEventListener('resize', () => {
   renderer.setPixelRatio(devicePixelRatio);
 });
 
+// ホイールを実装
+let speed = 0;
+let rotation = 0;
+addEventListener('wheel', (event) => {
+  speed += event.deltaY * 0.0002;
+});
+
+function rotate() {
+  rotation += speed;
+  speed *= 0.93;
+  // ジオメトリの回転
+  mesh1.position.x = 2 + 3.8 * Math.cos(rotation);
+  mesh1.position.z = -3 + 3.8 * Math.sin(rotation);
+  mesh2.position.x = 2 + 3.8 * Math.cos(rotation + Math.PI / 2);
+  mesh2.position.z = -3 + 3.8 * Math.sin(rotation + Math.PI / 2);
+  mesh3.position.x = 2 + 3.8 * Math.cos(rotation + Math.PI);
+  mesh3.position.z = -3 + 3.8 * Math.sin(rotation + Math.PI);
+  mesh4.position.x = 2 + 3.8 * Math.cos(rotation + 3 * (Math.PI / 2));
+  mesh4.position.z = -3 + 3.8 * Math.sin(rotation + 3 * (Math.PI / 2));
+
+  requestAnimationFrame(rotate);
+}
+
+rotate();
+
 // animation
+const clock = new THREE.Clock();
+
 const animate = () => {
   renderer.render(scene, camera);
+  let getDeltaTime = clock.getElapsedTime();
+
+  // メッシュを回転させる
+  for (const mesh of meshes) {
+    mesh.rotation.y += 0.001 * getDeltaTime;
+    mesh.rotation.x += 0.001 * getDeltaTime;
+  }
+
   requestAnimationFrame(animate);
 };
 
