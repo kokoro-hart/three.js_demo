@@ -108,6 +108,16 @@ function rotate() {
 
 rotate();
 
+// カーソルの取得
+const cursor = {};
+cursor.x = 0;
+cursor.y = 0;
+
+addEventListener('mousemove', (event) => {
+  cursor.x = event.clientX / sizes.width - 0.5;
+  cursor.y = event.clientX / sizes.height - 0.5;
+})
+
 // animation
 const clock = new THREE.Clock();
 
@@ -117,9 +127,12 @@ const animate = () => {
 
   // メッシュを回転させる
   for (const mesh of meshes) {
-    mesh.rotation.y += 0.001 * getDeltaTime;
     mesh.rotation.x += 0.001 * getDeltaTime;
+    mesh.rotation.y += 0.001 * getDeltaTime;
   }
+
+  // カメラの制御
+  camera.position.x += cursor.x * (getDeltaTime * 0.002);
 
   requestAnimationFrame(animate);
 };
